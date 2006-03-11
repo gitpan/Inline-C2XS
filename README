@@ -1,0 +1,10 @@
+Convert Inline::C code to XS code. See the module's documentation for details.
+
+Build in the usual way:
+
+perl Makefile.PL
+make test
+make install
+
+Cheers,
+Rob 

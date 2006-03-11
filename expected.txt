@@ -1,0 +1,234 @@
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include "INLINE.h"
+
+/* test_c2xs.c */
+//Written for testing c2xs.pl
+/* some comments
+
+
+ more comments
+end of comments */
+
+#include <header.h>
+
+#ifdef something
+#define somethingelse
+#endif
+
+void test_0 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments -1
+    inline_stack_vars
+    some irrelevant code {
+         more
+         again // comments -2
+         }
+    }
+
+unsigned long test_1 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 1
+    some irrelevant code {
+         more
+         again // comments 2
+         }
+    }
+
+unsigned long* test_2 (int a, double b, SV *c, SV*d, SV* e, SV * f) { /* comments 3 start here
+
+    comments finish here */
+    some irrelevant code {
+         more
+         again // comments 4
+         }
+    }
+
+unsigned long *test_3 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 5
+    some irrelevant code {
+         more
+         again // comments 6
+         }
+    }
+
+unsigned long*test_3 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 6
+    some irrelevant code {
+         more
+         again // comments 7
+         }
+    }
+
+void test_4 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 7
+    inline_stack_vars
+    some irrelevant code {
+         more
+         again // comments 8
+         }
+    }
+
+SV * test_5 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 9
+    inline_stack_vars
+    some irrelevant code {
+         more
+         again // comments 10
+         }
+    }
+
+SV *test_6 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 11
+    inline_stack_vars
+    some irrelevant code {
+         more
+         again // comments 12
+         }
+    }
+
+SV* test_7 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 13
+    inline_stack_vars
+    some irrelevant code { /* A comment here
+                           comment continues
+                           end of comment */
+         more
+         again // comments 14
+         }
+    }
+
+SV*test_8 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments 15
+    inline_stack_vars
+    some irrelevant code {
+         more
+         again // comments 16
+         }
+    }
+
+// Should be ignored
+
+/*
+
+void * ignore_me(int a, char * x){
+    no longer in use {
+        finished
+        done 
+        }
+    don't return { }
+} */
+
+
+
+
+
+
+MODULE = Some::Package::test_c2xs	PACKAGE = MyPackage
+
+PROTOTYPES: DISABLE
+
+void
+test_0 (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	test_0 (a, b, c, d, e, f);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+unsigned long
+test_1 (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+
+unsigned long*
+test_2  (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+
+unsigned long *
+test_3  (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+
+unsigned long*
+test_3  (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+
+void
+test_4 (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	test_4 (a, b, c, d, e, f);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+test_5  (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+
+SV *
+test_6  (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+
+SV*
+test_7  (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+
+SV*
+test_8  (a, b, c, d, e, f)
+	int a
+	double b
+	SV *c
+	SV*d
+	SV* e
+	SV * f 
+

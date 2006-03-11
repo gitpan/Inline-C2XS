@@ -1,0 +1,9 @@
+MANIFEST
+README
+CHANGES
+Makefile.PL
+C2XS.pm
+t/t_1.t
+expected.h
+expected.txt
+src/test_c2xs.c
