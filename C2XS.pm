@@ -7,7 +7,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(c2xs);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub c2xs {
     my $module = shift;
@@ -97,18 +97,28 @@ sub c2xs {
 
 sub format_code {
  my $ret = '';
+ my @vars;
  my $ellipsis = 0;
  my @start = split /\n/, $_[0];
+ #my $ignore_next = 0;
  for(@start) {
+    if ($_ =~ /typedef/
+        &&
+        $_ !~ /\wtypedef/
+        &&
+        $_ !~ /typedef\w/) { next} # Assume we've got a typedef.
     my $first = '';
     my @temp = ();
     my $second = '';
     my $last = '';
     my $in_brackets = '';
     my @proto = split /\(/, $_;
+    {
+    no warnings "uninitialized";
     chomp($proto[1]);
     $proto[1] =~ s/\)//;
-    my @vars = split /,/, $proto[1];
+    @vars = split /,/, $proto[1];
+    }
     for(@vars) {
        $_ =~ s/^\s+//;
        if($_ !~ /\.\.\./) {$last .= "\t$_\n"}
@@ -264,6 +274,13 @@ Inline::C2XS - create an XS file from an Inline C file.
   c2xs($module_name, $package_name);
 
 =head1 BUGS
+
+  Probably safest to put globals, typedefs and pre-processor 
+  directives in a separate header file and #include that file
+  in the .c file - rather than writing those 
+  declarations/typedefs/pre-processor commands at the beginning
+  of the .c file. (Inline::C2XS seems to handle them correctly,
+  but why take unnecessary risks ?)
 
   Assumes that the function prototypes/declarations are written on 
   the one line - ie a .c file containing this works fine:

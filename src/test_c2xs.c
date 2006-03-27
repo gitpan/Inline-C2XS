@@ -6,7 +6,22 @@
  more comments
 end of comments */
 
+  typedef struct card Card;
 #include <header.h>
+
+  typedef struct {
+  char* name;
+  char* rank;
+  long  serial;
+} Soldier;
+
+typedef struct 
+  {
+  char* name2;
+  char* rank2;
+  long  serial2;
+  }
+  Soldier2;
 
 #ifdef something
 #define somethingelse

@@ -1,1 +1,3 @@
- - 0.01 ... born
+- 0.02 Fix the problem of typedefs getting copied into the XS section.
+ 
+- 0.01 ... born
