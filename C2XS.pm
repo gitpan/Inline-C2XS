@@ -7,7 +7,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(c2xs);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub c2xs {
     my $module = shift;
@@ -20,7 +20,9 @@ sub c2xs {
     my $header_included = 0; # INLINE.h not included unless needed
     my $current = '';
     my $open_count = 0;
+    my $open_brace_count = 0;
     my $close_count = 0;
+    my $close_brace_count = 0;
     my $ignore = 0;
     my $script = '';
     my $done = 0;
@@ -35,8 +37,8 @@ sub c2xs {
        if($_ =~ /\*\//) { # We've reached the end of the comments section
          $_ = $'; # Set $_ to what comes after the '*/'.
          $ignore = 0; # Signifies that we're not in a comments section
-         if($_ eq "\n" || $_ eq '') {next} # $_ doesn't contain anything that can't be discarded.
-         }
+         unless($_ =~ /\S/) {next} # $_ doesn't contain anything that can't be discarded.
+        }
        else {next} # Still in the middle of multiline comments
        }
      if($_ =~ /^\s+\/\// || $_ =~ /^\/\//) {next} # Must be a line of comments only
@@ -67,8 +69,17 @@ sub c2xs {
 
      $open_count += $_ =~ tr/\{//;
      $close_count += $_ =~ tr/\}//;
+  
+     $open_brace_count += $_ =~ tr/\(//;
+     $close_brace_count += $_ =~ tr/\)//;
 
-     if(($open_count > $open_count_copy) && !$done) {
+     if(($open_brace_count > $close_brace_count) &&
+        ($open_count_copy == $close_count_copy)) {
+        chomp;
+        $current .= $_;
+        }
+
+     elsif(($open_count > $open_count_copy) && !$done) {
        @keep = split /\{/, $_;
        if($keep[0] =~ /\S/) {$current .= $keep[0] . "\n"}
        else {$current .= $backtrack}
@@ -77,12 +88,16 @@ sub c2xs {
 
      if($close_count == $open_count) {$done = 0}
      if($_ =~ /\S/) {$backtrack = $_}
+
      }
 
      close(READ) or die "Cannot close $filename.c: $!";
 
+#print "CURRENT: $current\n";
+
      # $current is a list of prototypes
      $current =~ s/\n+/\n/g; # Remove unneeded newlines
+     #print "CURRENT: $current\n";
      my $out = format_code($current);
 
      $prelude .= "\n";
@@ -259,7 +274,13 @@ Inline::C2XS - create an XS file from an Inline C file.
  The created XS file, when packaged with the '.pm' file, an
  appropriate 'Makefile.PL', and 'INLINE.h' (if it's needed),
  can be used to build the module in the usual way - without
- any dependence upon the Inline C module.
+ any dependence upon the Inline::C module.
+
+ It is assumed that the C source file contains code that will work
+ with Inline::C. No error checks are performed - and any errors (or
+ incompatibilities with Inline::C) that are present in the C source
+ file will no doubt be reflected (in some form or other) in the generated
+ XS file.
 
 =head1 SYNOPSIS
 
@@ -268,69 +289,14 @@ Inline::C2XS - create an XS file from an Inline C file.
   my $module_name = 'MY::XS_MOD';
   my $package_name = 'MY::XS_MOD';
 
-  # Create XS_MOD.xs from ./src/XS_MOD.c. Also creates INLINE.h, if
-  # that file is needed. 'XS_MOD.c' must be in a format that works
-  # with the Inline::C module and must be in the ./src folder.
+  # Create ./XS_MOD.xs from ./src/XS_MOD.c. Also creates ./INLINE.h,
+  # if that file is needed. 'XS_MOD.c' must be compatible with the
+  # Inline::C module and must be in the ./src folder.
   c2xs($module_name, $package_name);
 
 =head1 BUGS
 
-  Probably safest to put globals, typedefs and pre-processor 
-  directives in a separate header file and #include that file
-  in the .c file - rather than writing those 
-  declarations/typedefs/pre-processor commands at the beginning
-  of the .c file. (Inline::C2XS seems to handle them correctly,
-  but why take unnecessary risks ?)
-
-  Assumes that the function prototypes/declarations are written on 
-  the one line - ie a .c file containing this works fine:
-
-  unsigned long some_func(int a, double b, SV * c)
-    {
-    // code
-    }
-
-  And this also works fine:
-
-  unsigned long some_func(int a, double b, SV * c) {
-    // code
-    }
-
-  But this won't work (though it's valid C code, and works with
-  Inline::C):
-
-  unsigned long some_func(int a,
-                          double b,
-                          SV * c)
-    {
-    // code
-    }
-
-  Also, safest to keep comments to separate lines, or to the end of a
-  line. This won't be correctly parsed (by either Inline::C or Inline::C2XS):
-
-  /* A comment */ void another_func(char * something) // Another comment
-     {
-     printf("%s\n", something);
-     }
-
-  But there's no problem with:
-
-  /* A comment */
-  void another_func(char * something) { // Another comment
-     printf("%s\n", something);
-     }
-
-  And there's no problem with:
-
-  void another_func(char * something) { /* A comment
-  continuation of comment */ 
-     printf("%s\n", something);
-     }
-
-  Same applies to single line comments (//). 
-
-  Probably other bugs, too - patches/rewrites welcome.
+  No doubt bugs exist - patches/rewrites welcome.
   Send to sisyphus at cpan dot org
 
 =head1 COPYRIGHT

@@ -42,6 +42,41 @@ unsigned long test_1 (int a, double b, SV *c, SV*d, SV* e, SV * f) { // comments
          }
     }
 
+void typedef_and_multiline (int a,
+                            double b,
+                            SV * c,
+                            SV * d,
+                            SV * e,
+                            SV * f) {
+           some_code {
+               more_code;
+               again // comments
+               }
+    }
+
+
+
+
+void typedef_and_multiline2 (int a,
+                            double b,
+                            SV * c,
+                            SV * d,
+                            SV * e,
+                            SV * f)
+
+
+                           {
+
+
+           some_code {
+               more_code;
+               again // comments
+               }
+    }
+
+
+
+
 unsigned long* test_2 (int a, double b, SV *c, SV*d, SV* e, SV * f) { /* comments 3 start here
 
     comments finish here */
