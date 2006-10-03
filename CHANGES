@@ -5,3 +5,8 @@
 - 0.02 ... bugfixes
 
 - 0.03 ... more bugfixes
+
+- 0.04 ... Now hooks into the Inline::C routines that parse the code and write
+           the XS file.
+           The c2xs() sub now takes an optional 3rd argument (the directory
+           into which the XS file gets written).

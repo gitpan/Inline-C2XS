@@ -1,4 +1,3 @@
-
 #define Inline_Stack_Vars	dXSARGS
 #define Inline_Stack_Items      items
 #define Inline_Stack_Item(x)	ST(x)
