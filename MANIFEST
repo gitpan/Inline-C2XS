@@ -3,7 +3,10 @@ README
 CHANGES
 Makefile.PL
 C2XS.pm
-t/t_1.t
+t/t_c.t
+t/t_cpp.t
 expected.h
-expected.txt
+expected_c.txt
+expected_cpp.txt
 src/Polygon.c
+src/Inherit.cpp

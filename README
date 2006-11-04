@@ -1,4 +1,4 @@
-Convert Inline::C code to XS code. See the module's documentation for details.
+Convert Inline::C or Inline::CPP code to XS code. See the module's documentation for details.
 
 Build in the usual way:
 

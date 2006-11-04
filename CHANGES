@@ -1,12 +1,12 @@
-- 0.02 Fix the problem of typedefs getting copied into the XS section.
- 
-- 0.01 ... born
-
-- 0.02 ... bugfixes
-
-- 0.03 ... more bugfixes
+- 0.05 ... Add Inline::CPP to XS support with the cpp2xs() function.
 
 - 0.04 ... Now hooks into the Inline::C routines that parse the code and write
            the XS file.
            The c2xs() sub now takes an optional 3rd argument (the directory
            into which the XS file gets written).
+
+- 0.03 ... more bugfixes
+
+- 0.02 ... bugfixes
+
+- 0.01 ... born

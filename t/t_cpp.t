@@ -1,25 +1,25 @@
 use warnings;
 use strict;
-use Inline::C2XS qw(c2xs);
+use Inline::C2XS qw(cpp2xs);
 
 print "1..2\n";
 
-c2xs('Math::Geometry::Planar::GPC::Polygon', 'Math::Geometry::Planar::GPC::Polygon');
+cpp2xs('Math::Geometry::Planar::GPC::Inherit', 'Math::Geometry::Planar::GPC::Inherit');
 
-if(!rename('Polygon.xs', 'Polygon.txt')) {
-  print "not ok 1 - couldn't rename Polygon.xs\n";
+if(!rename('Inherit.xs', 'Inherit.txt')) {
+  print "not ok 1 - couldn't rename Inherit.xs\n";
   exit;
 }
 
 my $ok = 1;
 
-if(!open(RD1, "Polygon.txt")) {
-  print "not ok 1 - unable to open Polygon.txt for reading: $!\n";
+if(!open(RD1, "Inherit.txt")) {
+  print "not ok 1 - unable to open Inherit.txt for reading: $!\n";
   exit;
 }
 
-if(!open(RD2, "expected.txt")) {
-  print "not ok 1 - unable to open expected.txt for reading: $!\n";
+if(!open(RD2, "expected_cpp.txt")) {
+  print "not ok 1 - unable to open expected_cpp.txt for reading: $!\n";
   exit;
 }
 
@@ -27,9 +27,9 @@ my @rd1 = <RD1>;
 my @rd2 = <RD2>;
 
 if(scalar(@rd1) != scalar(@rd2)) {
-  print "not ok 1 - Polygon.txt does not have the expected number of lines\n";
-  close(RD1) or print "Unable to close Polygon.txt after reading: $!\n";
-  close(RD2) or print "Unable to close expected.txt after reading: $!\n";
+  print "not ok 1 - Inherit.txt does not have the expected number of lines\n";
+  close(RD1) or print "Unable to close Inherit.txt after reading: $!\n";
+  close(RD2) or print "Unable to close expected_cpp.txt after reading: $!\n";
   exit;
 }
 
@@ -48,17 +48,17 @@ for(my $i = 0; $i < scalar(@rd1); $i++) {
 }
 
 if(!$ok) {
-  print "not ok 1 - Polygon.txt does not match expected.txt\n";
-  close(RD1) or print "Unable to close Polygon.txt after reading: $!\n";
-  close(RD2) or print "Unable to close expected.txt after reading: $!\n";
+  print "not ok 1 - Inherit.txt does not match expected_cpp.txt\n";
+  close(RD1) or print "Unable to close Inherit.txt after reading: $!\n";
+  close(RD2) or print "Unable to close expected_cpp.txt after reading: $!\n";
   exit;
 }
 
 print "ok 1\n";
 
-close(RD1) or print "Unable to close Polygon.txt after reading: $!\n";
-close(RD2) or print "Unable to close expected.txt after reading: $!\n";
-if(!unlink('Polygon.txt')) { print "Couldn't unlink Polygon.txt\n"}
+close(RD1) or print "Unable to close Inherit.txt after reading: $!\n";
+close(RD2) or print "Unable to close expected_cpp.txt after reading: $!\n";
+if(!unlink('Inherit.txt')) { print "Couldn't unlink Inherit.txt\n"}
 
 $ok = 1;
 
