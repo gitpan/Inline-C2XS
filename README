@@ -1,5 +1,11 @@
 Convert Inline::C or Inline::CPP code to XS code. See the module's documentation for details.
 
+Both Inline::C and Inline::CPP are pre-requisites. If you don't want to utilise the 
+C++ to XS capability, then it's not really necessary to install Inline::CPP. You could
+just install Inline::C2XS anyway (though you'll see a warning about the fact that 
+Inline::CPP cannot be found, and the t\t_cpp.t tests will fail) and so long as Inline::C 
+can be found, the C to XS capability of Inline::C2XS will work just fine.
+
 Build in the usual way:
 
 perl Makefile.PL

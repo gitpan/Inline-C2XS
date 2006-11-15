@@ -9,14 +9,17 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(c2xs cpp2xs);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub c2xs {
     require "Inline/C.pm";
     my $module = shift;
     my $pkg = shift;
     my $build_dir = shift || '.';
-    $build_dir = '.' unless -d $build_dir;
+    unless(-d $build_dir) {
+       warn "$build_dir is not a valid directory ... file(s) will be written to the cwd instead\n";
+       $build_dir = '.';
+    }
     my $modfname = (split /::/, $module)[-1];
     my $need_inline_h = 0;
     my $code = '';
@@ -30,9 +33,9 @@ sub c2xs {
     close(RD) or die "Can't close src/$modfname.c after reading: $!";
 
     ## Initialise $o.
-    ## Many of these keys are not needed for the purpose of this
+    ## Many of these keys may not be needed for the purpose of this
     ## specific exercise - but they shouldn't do any harm, so I'll
-    ## leave them in, just in case they ever become necessary.
+    ## leave them in, just in case they're ever needed.
     $o->{CONFIG}{BUILD_TIMERS} = 0;
     $o->{CONFIG}{PRINT_INFO} = 0;
     $o->{CONFIG}{USING} = [];
@@ -82,11 +85,16 @@ sub c2xs {
 }
 
 sub cpp2xs {
+    ## This is just a copy'n'paste of the c2xs() function, with
+    ## all occurrences of "C" changed to "CPP" ... clever, eh ??
     require "Inline/CPP.pm";
     my $module = shift;
     my $pkg = shift;
     my $build_dir = shift || '.';
-    $build_dir = '.' unless -d $build_dir;
+    unless(-d $build_dir) {
+       warn "$build_dir is not a valid directory ... file(s) will be written to the cwd instead\n";
+       $build_dir = '.';
+    }
     my $modfname = (split /::/, $module)[-1];
     my $need_inline_h = 0;
     my $code = '';
@@ -100,9 +108,9 @@ sub cpp2xs {
     close(RD) or die "Can't close src/$modfname.cpp after reading: $!";
 
     ## Initialise $o.
-    ## Many of these keys are not needed for the purpose of this
+    ## Many of these keys may not be needed for the purpose of this
     ## specific exercise - but they shouldn't do any harm, so I'll
-    ## leave them in, just in case they ever become necessary.
+    ## leave them in, just in case they're ever needed.
     $o->{CONFIG}{BUILD_TIMERS} = 0;
     $o->{CONFIG}{PRINT_INFO} = 0;
     $o->{CONFIG}{USING} = [];
@@ -158,11 +166,11 @@ sub _build {
     $o->call('preprocess', 'Build Preprocess');
     $o->call('parse', 'Build Parse');
 
-    print "Writing ", $o->{API}{modfname}, ".xs\n";
+    print "Writing ", $o->{API}{modfname}, ".xs in the ", $o->{API}{build_dir}, " directory\n";
     $o->call('write_XS', 'Build Glue 1');
 
     if($need_inline_headers) {
-      print "Writing INLINE.h\n";
+      print "Writing INLINE.h in the ", $o->{API}{build_dir}, " directory\n";
       $o->call('write_Inline_headers', 'Build Glue 2');
     }
 }
@@ -172,14 +180,40 @@ __END__
 
 =head1 NAME
 
-Inline::C2XS - create an XS file from an Inline C or Inline CPP file.
+Inline::C2XS - create an XS file from Inline C or Inline CPP code.
+
+=head1 SYNOPSIS
+
+  use Inline::C2XS qw(c2xs);
+
+  my $module_name = 'MY::XS_MOD';
+  my $package_name = 'MY::XS_MOD';
+  my $build_dir = '/some/where/else';
+
+  # Create /some/where/else/XS_MOD.xs from ./src/XS_MOD.c
+  c2xs($module_name, $package_name, $build_dir);
+
+  # Or create XS_MOD.xs in the cwd:
+  c2xs($module_name, $package_name);
+
+  Alternatively, if it's C++ code we're dealing with:
+
+  use Inline::C2XS qw(cpp2xs);
+
+  my $module_name = 'MY::XS_MOD';
+  my $package_name = 'MY::XS_MOD';
+  my $build_dir = '/some/where/else';
+
+  # Create /some/where/else/XS_MOD.xs from ./src/XS_MOD.cpp
+  # May also create /some/where/else/CPP.map if that file is
+  # going to be needed:
+  cpp2xs($module_name, $package_name, $build_dir);
+
+  # Or create XS_MOD.xs (and CPP.map, if needed) in the cwd:
+  cpp2xs($module_name, $package_name);
 
 =head1 DESCRIPTION
  
- If the description that follows is a little difficult to follow,
- jump straight to the 'SYNOPSIS' section - which demonstrates just
- how easily this module can be used.
-
  Don't feed an actual Inline::C/CPP script to this module - it won't
  be able to parse it. It is capable of parsing correctly only
  that C/CPP code that is suitable for inclusion in an Inline::C/CPP
@@ -211,11 +245,11 @@ Inline::C2XS - create an XS file from an Inline C or Inline CPP file.
       printf("Hello world\n");
   }
 
- Inline::C2XS looks for the file in ./src directory - expecting that the
- filename will be the same as what appears after the final '::' in the
- module name (with a '.c'/'.cpp' extension). ie if the module is called
- My::Next::Mod the c2xs() function looks for a file ./src/Mod.c, and 
- creates a file named Mod.xs. (The cpp2xs function looks for a file
+ Inline::C2XS looks for the source file in ./src directory - expecting
+ that the filename will be the same as what appears after the final '::'
+ in the module name (with a '.c'/'.cpp' extension). ie if your module is
+ called My::Next::Mod the c2xs() function looks for a file ./src/Mod.c, 
+ and creates a file named Mod.xs. (The cpp2xs function looks for a file
  ./src/Mod.cpp and also creates a file named Mod.xs) Also created (by
  both the c2xs and cpp2xs functions, is the file 'INLINE.h' - but only
  if that file is needed. The generated xs file (and INLINE.h) will be 
@@ -223,37 +257,12 @@ Inline::C2XS - create an XS file from an Inline C or Inline CPP file.
  directory) is provided to the c2xs/cpp2xs function.
 
  The created XS file, when packaged with the '.pm' file, an
- appropriate 'Makefile.PL', and 'INLINE.h' (if it's needed),
- can be used to build the module in the usual way - without
- any dependence upon the Inline::C/CPP module.
-
-=head1 SYNOPSIS
-
-  use Inline::C2XS qw(c2xs);
-
-  my $module_name = 'MY::XS_MOD';
-  my $package_name = 'MY::XS_MOD';
-  my $build_dir = '/some/where/else';
-
-  # Create /some/where/else/XS_MOD.xs from ./src/XS_MOD.c
-  c2xs($module_name, $package_name, $build_dir);
-
-  # Or create XS_MOD.xs in the cwd:
-  c2xs($module_name, $package_name);
-
-  Alternatively, if it's C++ code we're dealing with:
-
-  use Inline::C2XS qw(cpp2xs);
-
-  my $module_name = 'MY::XS_MOD';
-  my $package_name = 'MY::XS_MOD';
-  my $build_dir = '/some/where/else';
-
-  # Create /some/where/else/XS_MOD.xs from ./src/XS_MOD.cpp
-  cpp2xs($module_name, $package_name, $build_dir);
-
-  # Or create XS_MOD.xs in the cwd:
-  cpp2xs($module_name, $package_name);
+ appropriate 'Makefile.PL', and 'INLINE.h' (if it's needed), can be 
+ used to build the module in the usual way - without any dependence
+ upon the Inline::C/CPP module. The cpp2xs() function may also produce
+ a file named 'CPP.map'. That file, if produced, is also needed for a
+ successful build. See the demos/cpp folder in the Inline::C2XS source
+ for an example of what's required.
 
 =head1 BUGS
 

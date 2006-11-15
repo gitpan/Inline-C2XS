@@ -8,5 +8,14 @@ t/t_cpp.t
 expected.h
 expected_c.txt
 expected_cpp.txt
+expected_typemap.txt
 src/Polygon.c
 src/Inherit.cpp
+demos/cpp/README
+demos/cpp/MANIFEST
+demos/cpp/Inherit.pm
+demos/cpp/Inherit.xs
+demos/cpp/CPP.map
+demos/cpp/Makefile.PL
+demos/cpp/test.pl
+demos/cpp/INLINE.h

@@ -2,9 +2,9 @@ use warnings;
 use strict;
 use Inline::C2XS qw(cpp2xs);
 
-print "1..2\n";
+print "1..3\n";
 
-cpp2xs('Math::Geometry::Planar::GPC::Inherit', 'Math::Geometry::Planar::GPC::Inherit');
+cpp2xs('Math::Geometry::Planar::GPC::Inherit', 'main');
 
 if(!rename('Inherit.xs', 'Inherit.txt')) {
   print "not ok 1 - couldn't rename Inherit.xs\n";
@@ -109,3 +109,51 @@ close(RD2) or print "Unable to close expected.h after reading: $!\n";
 if(!unlink('INLINE.h')) { print "Couldn't unlink INLINE.h\n"}
 
 print "ok 2\n";
+
+#############################################################################
+
+if(!open(RD1, "CPP.map")) {
+  print "not ok 3 - unable to open CPP.map for reading: $!\n";
+  exit;
+}
+
+if(!open(RD2, "expected_typemap.txt")) {
+  print "not ok 3 - unable to open expected_typemap.txt for reading: $!\n";
+  exit;
+}
+
+@rd1 = <RD1>;
+@rd2 = <RD2>;
+
+if(scalar(@rd1) != scalar(@rd2)) {
+  print "not ok 3 - CPP.map does not have the expected number of lines\n";
+  close(RD1) or print "Unable to close CPP.map after reading: $!\n";
+  close(RD2) or print "Unable to close expected_typemap.txt after reading: $!\n";
+  exit;
+}
+
+for(my $i = 0; $i < scalar(@rd1); $i++) {
+   # Try to take care of platform-specific issues with line endings.
+   $rd1[$i] =~ s/\n//g;
+   $rd2[$i] =~ s/\n//g;
+   $rd1[$i] =~ s/\r//g;
+   $rd2[$i] =~ s/\r//g;
+
+   if($rd1[$i] ne $rd2[$i]) {
+     $ok = 0;
+     last;
+   }
+}
+
+if(!$ok) {
+  print "not ok 3 - CPP.map does not match expected_typemap.txt\n";
+  close(RD1) or print "Unable to close CPP.map after reading: $!\n";
+  close(RD2) or print "Unable to close expected_typemap.txt after reading: $!\n";
+  exit;
+}
+
+close(RD1) or print "Unable to close CPP.map after reading: $!\n";
+close(RD2) or print "Unable to close expected_typemap.txt after reading: $!\n";
+if(!unlink('CPP.map')) { print "Couldn't unlink CPP.map\n"}
+
+print "ok 3\n";

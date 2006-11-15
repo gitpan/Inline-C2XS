@@ -1,3 +1,5 @@
+- 0.06 ... Add a demos/cpp folder with a CPP demo.
+
 - 0.05 ... Add Inline::CPP to XS support with the cpp2xs() function.
 
 - 0.04 ... Now hooks into the Inline::C routines that parse the code and write
