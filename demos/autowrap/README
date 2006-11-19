@@ -1,0 +1,13 @@
+MyMod.xs and INLINE.h were created by cd'ing to the directory that contains this file and 
+running a script that contained the Inline::C2XS function:
+
+c2xs("MyMod", "MyMod", ".", {AUTOWRAP => 1});
+
+'MyMod.pm', 'Makefile.PL', 't/test.t' and README (this file) were hand written - just to
+make the demo complete. To build MyMod just run:
+
+perl Makefile.PL
+make test
+
+You could even run 'make install' if you want - but I don't know why you would actually
+want to install this module.

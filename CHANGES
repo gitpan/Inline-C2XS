@@ -1,3 +1,7 @@
+- 0.07 ... Add coverage for AUTOWRAP, TYPEMAPS, and AUTO_INCLUDE.
+           The cpp2xs() function is no longer supported by this module.
+           Use Inline::CPP2XS instead.
+
 - 0.06 ... Add a demos/cpp folder with a CPP demo.
 
 - 0.05 ... Add Inline::CPP to XS support with the cpp2xs() function.
