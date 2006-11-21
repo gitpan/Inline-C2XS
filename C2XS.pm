@@ -9,7 +9,10 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(c2xs);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
+
+print "*****************\nThis module is deprecated. Please install the latest version of InlineX::C2XS instead\n";
+print "*****************\n";
 
 sub c2xs {
     eval {require "Inline/C.pm"};
@@ -123,7 +126,7 @@ __END__
 
 =head1 NAME
 
-Inline::C2XS - create an XS file from Inline C code.
+Inline::C2XS - This module is deprecated. Install InlineX::C2XS instead.
 
 =head1 SYNOPSIS
 
